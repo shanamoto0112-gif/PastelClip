@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="ショート動画にパステル調エフェクトを付けてダウンロード — 動画はブラウザ内だけで処理されます">
+  <title>PastelClip</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 class="header__title">PastelClip</h1>
+      <p class="header__tagline">冒頭実写 → パステル → 末尾実写</p>
+    </header>
+
+    <main class="main">
+      <!-- ① 動画選択 -->
+      <section class="card" aria-labelledby="upload-heading">
+        <h2 id="upload-heading" class="visually-hidden">動画を選択</h2>
+        <label class="upload-btn" for="video-input">
+          <span class="upload-btn__icon" aria-hidden="true">🎬</span>
+          <span class="upload-btn__text">動画を選択する</span>
+          <span class="upload-btn__hint">mp4・mov（最大60秒・500MB）</span>
+        </label>
+        <input
+          type="file"
+          id="video-input"
+          class="visually-hidden"
+          accept="video/mp4,video/quicktime,.mp4,.mov"
+        >
+        <p id="file-info" class="file-info" hidden></p>
+      </section>
+
+      <!-- ② 設定 -->
+      <section class="card" aria-labelledby="settings-heading">
+        <h2 id="settings-heading" class="card__heading">エフェクト設定</h2>
+
+        <div class="slider-group">
+          <label class="slider-label" for="intro-slider">
+            冒頭の実写時間
+            <span id="intro-value" class="slider-value">2秒</span>
+          </label>
+          <input
+            type="range"
+            id="intro-slider"
+            class="slider"
+            min="1"
+            max="5"
+            step="1"
+            value="2"
+          >
+        </div>
+
+        <div class="slider-group">
+          <label class="slider-label" for="outro-slider">
+            末尾の実写時間
+            <span id="outro-value" class="slider-value">2秒</span>
+          </label>
+          <input
+            type="range"
+            id="outro-slider"
+            class="slider"
+            min="1"
+            max="5"
+            step="1"
+            value="2"
+          >
+        </div>
+
+        <button type="button" id="apply-btn" class="btn btn--primary" disabled>
+          エフェクトを適用する
+        </button>
+      </section>
+
+      <!-- ③ 処理中（広告スペース付き） -->
+      <section id="processing-section" class="card card--processing" hidden>
+        <p class="processing__status" id="processing-status">処理中...</p>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar">
+          <div class="progress__fill" id="progress-fill"></div>
+        </div>
+        <p class="processing__percent" id="progress-text">0%</p>
+
+        <!-- 将来の広告挿入用スペース -->
+        <div id="ad-space" class="ad-space" aria-label="広告スペース（将来用）"></div>
+      </section>
+
+      <!-- ④ 完成 -->
+      <section id="result-section" class="card card--result" hidden>
+        <p class="result__message">✅ 完成！</p>
+        <button type="button" id="download-btn" class="btn btn--success">
+          動画をダウンロード
+        </button>
+        <button type="button" id="reset-btn" class="btn btn--ghost">
+          別の動画を処理する
+        </button>
+      </section>
+
+      <p id="error-message" class="error-message" role="alert" hidden></p>
+    </main>
+
+    <footer class="footer">
+      <p>動画はサーバーに送信されません。すべてブラウザ内で処理されます。</p>
+    </footer>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
