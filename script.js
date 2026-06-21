@@ -5,10 +5,11 @@ const FFMPEG_CORE_BASE = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/
 const TRANSITION_SEC = 0.5;
 const MAX_DURATION_SEC = 60;
 const MAX_FILE_SIZE_MB = 500;
-// Instagram風パステル（Phase 1 は固定。Phase 2 で強度スライダー予定）
+// 極端パステル・絵画風（Phase 2 で強度スライダー予定）
 const PASTEL_FILTER =
-  'eq=saturation=0.4:contrast=0.76:brightness=0.1:gamma=1.2,' +
-  'colorbalance=rm=0.07:gm=0.02:bm=-0.05:rh=0.06:gh=0.02:bh=0.04';
+  'gblur=sigma=1.4,' +
+  'eq=saturation=0.18:contrast=0.42:brightness=0.28:gamma=1.6:gamma_r=1.12:gamma_g=1.06:gamma_b=0.82,' +
+  'colorbalance=rs=0.14:gs=0.08:bs=-0.16:rm=0.2:gm=0.08:bm=-0.2:rh=0.16:gh=0.1:bh=0.14';
 
 const videoInput = document.getElementById('video-input');
 const fileInfo = document.getElementById('file-info');
