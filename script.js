@@ -104,11 +104,11 @@ function buildFilterComplex(introSec, outroSec, duration) {
   }
 
   return [
-    '[0:v]split=2[base][basecopy]',
-    '[basecopy]hue=s=0.6,eq=brightness=0.2:contrast=0.9:gamma=1.1[pastelv]',
-    `[base]trim=0:${introSec},setpts=PTS-STARTPTS[v0]`,
+    '[0:v]split=3[vintro][voutro][vfxsrc]',
+    '[vfxsrc]hue=s=0.6,eq=brightness=0.2:contrast=0.9:gamma=1.1[pastelv]',
+    `[vintro]trim=0:${introSec},setpts=PTS-STARTPTS[v0]`,
     `[pastelv]trim=start=${midStart}:end=${midEnd},setpts=PTS-STARTPTS[v1]`,
-    `[base]trim=start=${outroStart}:end=${duration},setpts=PTS-STARTPTS[v2]`,
+    `[voutro]trim=start=${outroStart}:end=${duration},setpts=PTS-STARTPTS[v2]`,
     `[v0][v1]xfade=transition=fade:duration=${TRANSITION_SEC}:offset=${introSec - TRANSITION_SEC}[x01]`,
     `[x01][v2]xfade=transition=fade:duration=${TRANSITION_SEC}:offset=${duration - outroSec - TRANSITION_SEC}[out]`,
   ].join(';');
@@ -154,11 +154,14 @@ async function processVideo(file, introSec, outroSec) {
   setProgress(0, '動画を解析中...');
   applyBtn.disabled = true;
 
+  const ffmpegLogs = [];
+
   try {
     const duration = await getVideoDuration(file);
     const filterComplex = buildFilterComplex(introSec, outroSec, duration);
 
     const ffmpeg = await loadFFmpeg();
+    ffmpeg.on('log', ({ message }) => ffmpegLogs.push(message));
     setProgress(8, '動画を読み込み中...');
 
     const ext = getInputExtension(file);
@@ -183,7 +186,13 @@ async function processVideo(file, introSec, outroSec) {
     ]);
 
     if (exitCode !== 0) {
-      throw new Error('動画の変換に失敗しました。別の動画でお試しください。');
+      const lastLog = ffmpegLogs.filter((l) => /error|invalid|failed|aborted/i.test(l)).pop()
+        || ffmpegLogs.slice(-3).join(' ');
+      throw new Error(
+        lastLog
+          ? `動画の変換に失敗しました: ${lastLog}`
+          : '動画の変換に失敗しました。別の動画でお試しください。'
+      );
     }
 
     setProgress(98, '仕上げ中...');
