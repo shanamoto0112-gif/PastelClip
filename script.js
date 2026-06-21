@@ -20,12 +20,14 @@ const progressBar = document.getElementById('progress-bar');
 const progressFill = document.getElementById('progress-fill');
 const progressText = document.getElementById('progress-text');
 const resultSection = document.getElementById('result-section');
+const previewVideo = document.getElementById('preview-video');
 const downloadBtn = document.getElementById('download-btn');
 const resetBtn = document.getElementById('reset-btn');
 const errorMessage = document.getElementById('error-message');
 
 let selectedFile = null;
 let outputBlob = null;
+let outputPreviewUrl = null;
 let ffmpegInstance = null;
 
 function hideError() {
@@ -62,6 +64,21 @@ function showFirstLoadHint() {
 function hideFirstLoadHint() {
   processingHint.hidden = true;
   processingHint.textContent = '';
+}
+
+function clearPreview() {
+  if (outputPreviewUrl) {
+    URL.revokeObjectURL(outputPreviewUrl);
+    outputPreviewUrl = null;
+  }
+  previewVideo.removeAttribute('src');
+  previewVideo.load();
+}
+
+function showPreview(blob) {
+  clearPreview();
+  outputPreviewUrl = URL.createObjectURL(blob);
+  previewVideo.src = outputPreviewUrl;
 }
 
 function formatFileSize(bytes) {
@@ -227,6 +244,7 @@ async function processVideo(file, introSec, outroSec) {
 
     setProgress(100, '完了！');
     processingSection.hidden = true;
+    showPreview(outputBlob);
     resultSection.hidden = false;
   } catch (err) {
     processingSection.hidden = true;
@@ -240,6 +258,7 @@ videoInput.addEventListener('change', async (e) => {
   hideError();
   resultSection.hidden = true;
   processingSection.hidden = true;
+  clearPreview();
   outputBlob = null;
 
   const file = e.target.files[0];
@@ -305,6 +324,7 @@ downloadBtn.addEventListener('click', () => {
 resetBtn.addEventListener('click', () => {
   selectedFile = null;
   outputBlob = null;
+  clearPreview();
   videoInput.value = '';
   fileInfo.hidden = true;
   resultSection.hidden = true;

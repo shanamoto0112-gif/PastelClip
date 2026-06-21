@@ -89,6 +89,17 @@
       <!-- ④ 完成 -->
       <section id="result-section" class="card card--result" hidden>
         <p class="result__message">✅ 完成！</p>
+        <div class="preview">
+          <p class="preview__label">プレビュー</p>
+          <video
+            id="preview-video"
+            class="preview__video"
+            controls
+            playsinline
+            preload="metadata"
+          ></video>
+          <p class="preview__hint">再生して確認してからダウンロードできます</p>
+        </div>
         <button type="button" id="download-btn" class="btn btn--success">
           動画をダウンロード
         </button>
@@ -105,6 +116,6 @@
     </footer>
   </div>
 
-  <script type="module" src="script.js?v=6"></script>
+  <script type="module" src="script.js?v=7"></script>
 </body>
 </html>
