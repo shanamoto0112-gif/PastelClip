@@ -122,7 +122,8 @@ function buildFilterComplex(introSec, outroSec, duration) {
     `[pastelv]trim=start=${midStart}:end=${midEnd},setpts=PTS-STARTPTS[v1]`,
     `[voutro]trim=start=${outroStart}:end=${duration},setpts=PTS-STARTPTS[v2]`,
     `[v0][v1]xfade=transition=fade:duration=${TRANSITION_SEC}:offset=${introSec - TRANSITION_SEC}[x01]`,
-    `[x01][v2]xfade=transition=fade:duration=${TRANSITION_SEC}:offset=${duration - outroSec - TRANSITION_SEC}[out]`,
+    `[x01][v2]xfade=transition=fade:duration=${TRANSITION_SEC}:offset=${duration - outroSec - TRANSITION_SEC}[outv]`,
+    '[outv]format=yuv420p[out]',
   ].join(';');
 }
 
@@ -193,10 +194,16 @@ async function processVideo(file, introSec, outroSec) {
       '-map', '[out]',
       '-map', '0:a?',
       '-c:v', 'libx264',
+      '-pix_fmt', 'yuv420p',
+      '-profile:v', 'main',
+      '-level', '4.0',
       '-preset', 'fast',
       '-crf', '23',
       '-c:a', 'aac',
       '-b:a', '128k',
+      '-ar', '44100',
+      '-ac', '2',
+      '-shortest',
       '-movflags', '+faststart',
       outputName,
     ]);
@@ -213,7 +220,7 @@ async function processVideo(file, introSec, outroSec) {
 
     setProgress(98, '仕上げ中...');
     const data = await ffmpeg.readFile(outputName);
-    outputBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    outputBlob = new Blob([data], { type: 'video/mp4' });
 
     await ffmpeg.deleteFile(inputName);
     await ffmpeg.deleteFile(outputName);
