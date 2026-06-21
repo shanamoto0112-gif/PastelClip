@@ -1,5 +1,5 @@
-import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
-import { fetchFile, toBlobURL } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
+import { FFmpeg } from './vendor/ffmpeg/index.js';
+import { fetchFile, toBlobURL } from './vendor/ffmpeg-util/index.js';
 
 const FFMPEG_CORE_BASE = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
 const TRANSITION_SEC = 0.5;
