@@ -5,6 +5,10 @@ const FFMPEG_CORE_BASE = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/
 const TRANSITION_SEC = 0.5;
 const MAX_DURATION_SEC = 60;
 const MAX_FILE_SIZE_MB = 500;
+// Instagram風パステル（Phase 1 は固定。Phase 2 で強度スライダー予定）
+const PASTEL_FILTER =
+  'eq=saturation=0.4:contrast=0.76:brightness=0.1:gamma=1.2,' +
+  'colorbalance=rm=0.07:gm=0.02:bm=-0.05:rh=0.06:gh=0.02:bh=0.04';
 
 const videoInput = document.getElementById('video-input');
 const fileInfo = document.getElementById('file-info');
@@ -134,7 +138,7 @@ function buildFilterComplex(introSec, outroSec, duration) {
 
   return [
     '[0:v]split=3[vintro][voutro][vfxsrc]',
-    '[vfxsrc]hue=s=0.6,eq=brightness=0.2:contrast=0.9:gamma=1.1[pastelv]',
+    `[vfxsrc]${PASTEL_FILTER}[pastelv]`,
     `[vintro]trim=0:${introSec},setpts=PTS-STARTPTS[v0]`,
     `[pastelv]trim=start=${midStart}:end=${midEnd},setpts=PTS-STARTPTS[v1]`,
     `[voutro]trim=start=${outroStart}:end=${duration},setpts=PTS-STARTPTS[v2]`,
