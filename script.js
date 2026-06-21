@@ -15,6 +15,7 @@ const outroValue = document.getElementById('outro-value');
 const applyBtn = document.getElementById('apply-btn');
 const processingSection = document.getElementById('processing-section');
 const processingStatus = document.getElementById('processing-status');
+const processingHint = document.getElementById('processing-hint');
 const progressBar = document.getElementById('progress-bar');
 const progressFill = document.getElementById('progress-fill');
 const progressText = document.getElementById('progress-text');
@@ -50,6 +51,17 @@ function setProgress(percent, statusText) {
   if (statusText) {
     processingStatus.textContent = statusText;
   }
+}
+
+function showFirstLoadHint() {
+  processingHint.textContent =
+    '初回だけ30秒〜1分ほどかかります。動画エンジンをダウンロードしています。そのままお待ちください。';
+  processingHint.hidden = false;
+}
+
+function hideFirstLoadHint() {
+  processingHint.hidden = true;
+  processingHint.textContent = '';
 }
 
 function formatFileSize(bytes) {
@@ -125,6 +137,8 @@ async function loadFFmpeg() {
     }
   });
 
+  showFirstLoadHint();
+
   setProgress(2, 'FFmpeg を読み込み中...');
 
   try {
@@ -141,6 +155,8 @@ async function loadFFmpeg() {
     throw new Error(
       `FFmpeg の読み込みに失敗しました。ネットワーク接続を確認して再試行してください。（${detail}）`
     );
+  } finally {
+    hideFirstLoadHint();
   }
 
   ffmpegInstance = ffmpeg;
@@ -207,6 +223,7 @@ async function processVideo(file, introSec, outroSec) {
     resultSection.hidden = false;
   } catch (err) {
     processingSection.hidden = true;
+    hideFirstLoadHint();
     showError(err.message || '処理中にエラーが発生しました。');
     applyBtn.disabled = !selectedFile;
   }
