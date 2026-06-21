@@ -1,8 +1,7 @@
-import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
-import { fetchFile, toBlobURL } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
+import { FFmpeg } from './vendor/ffmpeg/index.js';
+import { fetchFile, toBlobURL } from './vendor/ffmpeg-util/index.js';
 
 const FFMPEG_CORE_BASE = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
-const FFMPEG_WORKER_URL = new URL('./ffmpeg/worker.js', import.meta.url).href;
 const TRANSITION_SEC = 0.5;
 const MAX_DURATION_SEC = 60;
 const MAX_FILE_SIZE_MB = 500;
@@ -131,7 +130,6 @@ async function loadFFmpeg() {
   await ffmpeg.load({
     coreURL: await toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
     wasmURL: await toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
-    classWorkerURL: FFMPEG_WORKER_URL,
   });
 
   ffmpegInstance = ffmpeg;
