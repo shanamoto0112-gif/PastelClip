@@ -1,7 +1,7 @@
 import { FFmpeg } from './vendor/ffmpeg/index.js';
 import { fetchFile, toBlobURL } from './vendor/ffmpeg-util/index.js';
 
-const FFMPEG_CORE_BASE = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+const FFMPEG_CORE_BASE = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
 const TRANSITION_SEC = 0.5;
 const MAX_DURATION_SEC = 60;
 const MAX_FILE_SIZE_MB = 500;
@@ -127,10 +127,21 @@ async function loadFFmpeg() {
 
   setProgress(2, 'FFmpeg を読み込み中...');
 
-  await ffmpeg.load({
-    coreURL: await toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
-    wasmURL: await toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
-  });
+  try {
+    const [coreURL, wasmURL] = await Promise.all([
+      toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
+      toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
+    ]);
+
+    setProgress(5, 'FFmpeg を初期化中...');
+
+    await ffmpeg.load({ coreURL, wasmURL });
+  } catch (err) {
+    const detail = err?.message || String(err);
+    throw new Error(
+      `FFmpeg の読み込みに失敗しました。ネットワーク接続を確認して再試行してください。（${detail}）`
+    );
+  }
 
   ffmpegInstance = ffmpeg;
   return ffmpeg;
