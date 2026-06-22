@@ -7,6 +7,19 @@
 ## 仕様
 
 - [docs/pastel_video_effect_spec_v2.md](docs/pastel_video_effect_spec_v2.md)
+- [docs/pastel-style-transfer-vision.md](docs/pastel-style-transfer-vision.md) — 実写を保ったパステル画風変換の方向性
+
+## パステル画風プレビュー（開発中）
+
+**同じ実写の構図・顔・ポーズを維持**したまま、見た目だけパステル画風にする試作です。
+
+```powershell
+# 元画像を docs/reference/ に置いてから
+pip install -r tools/requirements.txt
+python tools/preview_pastel_style.py
+```
+
+詳細: [docs/reference/README.md](docs/reference/README.md)
 
 ## ファイル構成
 
