@@ -3,3 +3,4 @@ Thumbs.db
 node_modules/
 dist/
 .netlify/
+docs/reference/output/
