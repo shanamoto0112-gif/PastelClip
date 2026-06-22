@@ -26,8 +26,9 @@ PRESETS = {
         "colors": 14,
         "edge_strength": 0.55,
         "stroke_blend": 0.4,
-        "brightness": 1.12,
+        "brightness": 1.14,
         "saturation": 0.75,
+        "shadow_lift": 0.15,
         "grain": 0.09,
     },
     "medium": {
@@ -36,8 +37,9 @@ PRESETS = {
         "colors": 20,
         "edge_strength": 0.38,
         "stroke_blend": 0.28,
-        "brightness": 1.08,
+        "brightness": 1.12,
         "saturation": 0.82,
+        "shadow_lift": 0.12,
         "grain": 0.06,
     },
     "refined": {
@@ -48,6 +50,7 @@ PRESETS = {
         "stroke_blend": 0.18,
         "brightness": 1.14,
         "saturation": 0.62,
+        "shadow_lift": 0.22,
         "grain": 0.04,
     },
 }
@@ -124,6 +127,19 @@ def adjust_tone(image: np.ndarray, brightness: float, saturation: float) -> np.n
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
 
+def lift_shadows(image: np.ndarray, amount: float) -> np.ndarray:
+    """影を黒く潰さず、淡いパステル調の影にする。"""
+    if amount <= 0:
+        return image
+    lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+    l = lab[:, :, 0].astype(np.float32) / 255.0
+    # 暗いほど持ち上げる（ハイライトはほぼそのまま）
+    lift = (1.0 - l) * amount
+    l = np.clip(l + lift * (1.0 - l), 0, 1)
+    lab[:, :, 0] = (l * 255).astype(np.uint8)
+    return cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
+
+
 def to_pastel(image: np.ndarray, preset: dict) -> np.ndarray:
     smooth = cv2.edgePreservingFilter(
         image, flags=2, sigma_s=preset["sigma_s"], sigma_r=preset["sigma_r"]
@@ -133,6 +149,7 @@ def to_pastel(image: np.ndarray, preset: dict) -> np.ndarray:
     painted = soft_colored_edges(painted, preset["edge_strength"])
     painted = stroke_texture(painted, preset["stroke_blend"])
     painted = adjust_tone(painted, preset["brightness"], preset["saturation"])
+    painted = lift_shadows(painted, preset.get("shadow_lift", 0))
     painted = add_paper_grain(painted, preset["grain"])
     return painted
 
